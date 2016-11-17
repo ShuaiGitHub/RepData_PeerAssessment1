@@ -5,7 +5,6 @@ output:
     keep_md: true
 ---
 
-
 ## Loading and preprocessing the data
 ```{r}
 raw_data<-read.csv('activity.csv')
