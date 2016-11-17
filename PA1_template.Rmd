@@ -1,5 +1,5 @@
 ---
-title: "Reproducible Research: Peer Assessment 1"
+title: "Reproducible Research: Peer Assessment 1, by Shuai Wang"
 output: 
   html_document:
     keep_md: true
@@ -7,16 +7,35 @@ output:
 
 
 ## Loading and preprocessing the data
-
-
-
+```{r}
+raw_data<-read.csv('activity.csv')
+summary(raw_data)
+```
 ## What is mean total number of steps taken per day?
-
-
-
+1. ignore the missing data using na.omit
+2. use reshape2 library to sum by date
+3. plot the histogram
+```{r}
+complete_data<-na.omit(raw_data)
+complete_data$date<-as.Date(complete_data$date)
+complete_data$interval<-as.factor(complete_data$interval)
+aggdata <-aggregate(steps~date+interval,complete_data,FUN=mean)
+print(aggdata)
+```
+Plot the histogram
+```{r}
+hist(aggdata$steps, main="Histogram of steps taken per day",xlab="Number of Steps", ylab="Count")
+```
+So we can easily report mean and median by  
+```{r}
+print(mean(aggdata$steps))
+print(median(aggdata$steps))
+```
 ## What is the average daily activity pattern?
+1. Make a time series plot (i.e. type = "l") of the 5-minute interval (x-axis) and the average number of steps taken, averaged across all days (y-axis)
+2. Which 5-minute interval, on average across all the days in the dataset, contains the maximum number of steps?
 
-
+``` 
 
 ## Imputing missing values
 
