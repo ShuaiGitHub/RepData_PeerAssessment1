@@ -56,24 +56,36 @@ print(sum(is.na(raw_data$steps)))
 2. Devise a strategy for filling in all of the missing values in the dataset. The strategy does not need to be sophisticated. For example, you could use the mean/median for that day, or the mean for that 5-minute interval, etc.
 In this problem, we use the mean for 5-minute intervals that don't have steps (marked as missing)
 ```{r}
-raw_data<-read.csv('activity.csv')
-raw_data$date<-as.Date(raw_data$date)
-full_data<-raw_data[complete.cases(raw_data),]
-#full_data[which(full_data[,'date']==as.Date('2012-10-02')),3]
+#myFinder function will find the value
+raw_data$interval<-as.factor(raw_data$interval)
 myFinder<-function(x){
-  if(is.na(x['steps'])) {
-    return(NA)
+  if(is.na(x[1])) {
+    tmp<-x[3]
+    target<-subset(avgIntervalData,interval == tmp)
+    newRow<-data.frame(c(as.numeric(target['steps']),x[2],x[3]))
+    row.names(newRow)<-row.names(x)
+    return (newRow)
   } else {
-  idx<-which(full_data[,'date']==as.Date(x['date']))# This finds the
-  return (full_data[idx,'steps'])
-  }
+    newRow<-x
+    row.names(newRow)<-row.names(x)
+    return (newRow)# otherwise make no change
+ }
 }
+myChecker<-function(x){
+  return (x['date'])
+}
+newData<-t(as.data.frame(apply(raw_data,1,myFinder)))
+head(newData,5)
+summary(newData)
 ```
 
 3. Create a new dataset that is equal to the original dataset but with the missing data filled in.
-
+Please see the "newData" dataframe
 4. Make a histogram of the total number of steps taken each day and Calculate and report the mean and median total number of steps taken per day. Do these values differ from the estimates from the first part of the assignment? What is the impact of imputing missing data on the estimates of the total daily number of steps?
-Are there differences in activity patterns between weekdays and week- ends?
+```{r}
+aggdata <-aggregate(steps~date+interval,newData,FUN=mean)
+```
+5. Are there differences in activity patterns between weekdays and week- ends?
 For this part the weekdays() function may be of some help here. Use the dataset with the filled-in missing values for this part.
 1. Create a new factor variable in the dataset with two levels – “weekday” and “weekend” indicating whether a given date is a weekday or weekend day.
 2. Make a panel plot containing a time series plot (i.e. type = "l") of the 5-minute interval (x-axis) and the average number of steps taken, averaged across all weekday days or weekend days (y-axis). The plot should look something like the following, which was creating using simulated data:
