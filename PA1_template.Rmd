@@ -18,7 +18,7 @@ summary(raw_data)
 complete_data<-na.omit(raw_data)
 complete_data$date<-as.Date(complete_data$date)
 complete_data$interval<-as.factor(complete_data$interval)
-aggdata <-aggregate(steps~date+interval,complete_data,FUN=mean)
+aggdata <-aggregate(steps~date,complete_data,FUN=sum)
 #print(aggdata)
 ```
 Plot the histogram
@@ -74,7 +74,8 @@ myFinder<-function(x){
 myChecker<-function(x){
   return (x['date'])
 }
-newData<-t(as.data.frame(apply(raw_data,1,myFinder)))
+newData<-as.data.frame(t(as.data.frame(apply(raw_data,1,myFinder))))
+newData$steps<-as.numeric(as.character(newData$steps))
 head(newData,5)
 summary(newData)
 ```
@@ -83,12 +84,25 @@ summary(newData)
 Please see the "newData" dataframe
 4. Make a histogram of the total number of steps taken each day and Calculate and report the mean and median total number of steps taken per day. Do these values differ from the estimates from the first part of the assignment? What is the impact of imputing missing data on the estimates of the total daily number of steps?
 ```{r}
-aggdata <-aggregate(steps~date+interval,newData,FUN=mean)
+newData$steps<-as.numeric(newData$steps)
+aggSimulateData <-aggregate(steps~date,newData,FUN=sum)
+hist(aggSimulateData$steps, main="Histogram of steps taken per day",xlab="Number of Steps", ylab="Count")
 ```
 5. Are there differences in activity patterns between weekdays and week- ends?
 For this part the weekdays() function may be of some help here. Use the dataset with the filled-in missing values for this part.
+```{r}
+#solution from this thread: #http://stackoverflow.com/questions/26441700/how-to-determine-if-date-is-a-weekend-or-not-not-using-lubridate
+library(chron)
+newData$wday <-as.factor(is.weekend(newData$date))
+
+levels(newData$wday)<-as.factor(c("weekday","weekend"))
+```
 1. Create a new factor variable in the dataset with two levels – “weekday” and “weekend” indicating whether a given date is a weekday or weekend day.
 2. Make a panel plot containing a time series plot (i.e. type = "l") of the 5-minute interval (x-axis) and the average number of steps taken, averaged across all weekday days or weekend days (y-axis). The plot should look something like the following, which was creating using simulated data:
+```{r}
+weekdayAllData<-subset(newData,wday=="weekday")
+rownames(weekdayAllData) <- NULL
 
+```
 
 ## Are there differences in activity patterns between weekdays and weekends?
